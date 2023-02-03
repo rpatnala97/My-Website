@@ -1,0 +1,23 @@
+const numbers = [1, 2, 3, 4, 5];
+const updnum = numbers.forEach(num => {
+  return num >= 3;
+})
+console.log(updnum);
+
+const names = ['Rinku', 'Abhi', 'Sridevi', 'Somasekhar'];
+const updnam = names.map(nam => {
+  return nam.length > 5;
+})
+const updname = names.filter(name => {
+  return name.length > 5;
+})
+console.log(updnam);
+console.log(updname);
+const updfind = names.findIndex(naf => {
+  return naf.length > 7;
+})
+console.log(updfind);
+const updred = names.reduce(nar => {
+  return nar.length < 5;
+})
+console.log(updred);
