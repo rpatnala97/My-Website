@@ -1,0 +1,67 @@
+use("sample_analytics")
+
+
+
+
+db.customers.find({name : "John Parks"}
+)
+
+db.accounts.find(
+  {account_id : 240640}
+)
+
+db.transactions.find(
+  {account_id : 240640}
+) 
+
+//$lookup
+//from : other collection
+//localField : key from the local collection
+//foreignField : key from the other collection
+//as : alias 
+db.customers.aggregate(
+  {
+    $lookup : {
+      from : "accounts",
+      localField : "accounts",
+      foreignField : "account_id",
+      as : "acc"
+    }
+  },
+  {$unwind : "$acc"},
+  {$match : {name : "John Parks"}},
+  {$project : {_id : 0, account_id : "$acc.account_id",
+              products : "$acc.products"
+  }}
+)
+ db.customers.aggregate(
+  {
+    $lookup : {
+      from : "transactions",
+      localField : "accounts",
+       foreignField : "account_id",
+       as : "trans"
+    }
+  },
+  {$unwind : "$trans"},
+  {$match : {name : "John Parks"}},
+  {$project : {_id : 0, account_id : "$trans.account_id",
+              code : "$trans.transactions.transaction_code",
+              symbol : "$trans.transactions.symbol",
+              price : "$trans.transactions.price"
+
+  }} ,
+  {$unwind : "$code"},
+  {$unwind : "$symbol"},
+  //{$unwind : "$price"},          
+)
+
+//acc = myCursor.next()
+
+//for(i=0; i<acc.code.length; i++){
+ // item = {code : acc.code[i], symbol : acc.symbol[i],
+    //      price : acc.price[i]
+  //}
+ // db.results.insertOne(item)
+//}
+

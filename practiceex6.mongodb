@@ -1,0 +1,10 @@
+use("Company")
+
+db.companies.aggregate([
+  {$unwind: "$acquisitions"},
+  {$match: {"acquisitions.company.name" : "Instagram"
+  }},
+  {$project: {_id: 0, name: 1, "acquisitions.price_amount" : 1,
+  acquired_company : "$acquisitions.company.name"
+  }}
+])

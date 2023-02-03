@@ -1,0 +1,81 @@
+use("Company")
+
+db.companies.aggregate(
+  {$match : {"funding_rounds.investments.financial_org.permalink" : "greylock"}},
+  {$project : {_id : 0, name : 1, 
+              amount : "$funding_rounds.raised_amount", 
+              total_rounds : {$size : "$funding_rounds"}
+  }}
+)
+
+db.companies.aggregate(
+  {$match : {name : "Facebook"}},
+  {$project : {_id : 0, name : 1,
+      first_round : {$slice : ["$funding_rounds", 0, 1]},
+      last_round : {$slice : ["$funding_rounds", -1]}
+  }}
+)
+
+db.companies.aggregate(
+  {$match : {name : "Facebook"}},
+  {$project : {_id : 0, name : 1,
+      first_round : {$arrayElemAt : ["$funding_rounds", 0]},
+      last_round : {$arrayElemAt : ["$funding_rounds", -1]}
+  }}
+)
+
+db.companies.aggregate(
+  {$match : {"funding_rounds" : {$exists : true, $ne : []}}},
+  {$project : {_id : 0, name : 1, founded_year : 1,
+              largest_round : {$max : "$funding_rounds.raised_amount"}
+  }},
+  {$sort : {largest_round : -1}},
+  {$limit : 10}
+)
+
+db.companies.aggregate(
+  {$match : {"funding_rounds" : {$exists : true, $ne : []}}},
+  {$project : {_id : 0, name : 1, founded_year : 1,
+              total_round : {$sum : "$funding_rounds.raised_amount"}
+  }},
+  {$sort : {total_round : -1}},
+  {$limit : 10}
+)
+
+//filter
+//input - some attribute
+//as - alias
+//cond - condition
+db.companies.aggregate(
+  {$project : {_id : 0, name : 1, founded_year : 1,
+              funding : {$filter : {
+                        input : "$funding_rounds",
+                        as : "fr",
+                        cond : {$gte : ["$$fr.raised_amount", 1000000000]}
+              }}
+  }},
+  {$match : {funding : {$ne : []}}},
+  {$project : {_id : 0, name : 1, founded_year : 1, "funding.raised_amount" : 1}}
+)
+
+//group
+//_id
+//action
+db.companies.aggregate(
+  {$match : {founded_year : {$gt : 2010}}},
+  {$group : {
+    _id : {founded_year : "$founded_year", category_code : "$category_code"},
+    average_num_employees : {$avg : "$number_of_employees"},
+    company_names : {$push : "$name"}
+  }},
+  {$sort : {average_num_employees : -1}},
+  {$out : "output"}
+)
+
+db.output.find()
+
+
+//db.companies.aggregate(
+  //{$match : {name : "DeNA"}},
+  //{$count : "Total"}
+//)

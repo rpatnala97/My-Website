@@ -1,0 +1,27 @@
+use("Company")
+
+db.companies.aggregate(
+  {$project: {_id:0,name:1,founded_year:1,
+      funding: {$filter: {
+        input: "$funding_rounds",
+        as: "fr",
+        cond: {$gte : ["$$fr.raised_amount",1000000000]}
+        }}
+        }},
+  {$match: {funding: {$ne: []}}},
+  {$project: {_id:0,name:1,founded_year:1,"funding.raised_amount":1}}      
+)
+
+db.companies.aggregate(
+  {$match: {founded_year: {$gt: 2010}}},
+  {$group: {
+    _id: {founded_year: "$founded_year", category_code: "$category_code"},
+    average_num_employees: {$avg: "$number_of_employees"},
+    company_names: {$push: "name"}
+}},
+{$sort: {average_num_employees: -1}},
+{$out: "output"}
+)
+
+db.output.find()
+

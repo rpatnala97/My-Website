@@ -1,0 +1,49 @@
+use("Company")
+
+db.companies.find(
+  {founded_year : 2004},
+  {_id : 0, name : 1, founded_year : 1}
+).sort({name : 1}).limit(5)
+
+db.companies.aggregate([
+ {$match : {founded_year : 2004}},
+ {$project : {_id : 0, name : 1, founded_year : 1}},
+ {$sort : {name : 1}},
+ {$limit : 5}
+])
+
+db.companies.aggregate([
+  {$match : {$or : [
+    {founded_year : 2012}, {founded_year : 2010}
+  ]}},
+  {$project : {_id : 0, name : 1, founded_year : 1}},
+  {$count : "total"}
+])
+
+//db.companies.aggregate([
+//{$match : {name : "Facebook"}
+  //}
+//])
+
+db.companies.aggregate([
+  {$match: {"funding_rounds.investments.financial_org.permalink" : "greylock"}},
+  {$project : {_id : 0, name : 1, founded_year : 1,
+                "ipo.pub_year" : 1,
+                "ipo.valuation_amount" : 1,
+                "ipo.stock_symbol" : 1
+  }},
+])
+
+db.companies.aggregate([
+{$match : {name : "Facebook"}
+  }
+])
+
+db.companies.aggregate([
+  {$match: {"funding_rounds.investments.financial_org.permalink" : "greylock"}},
+  {$unwind : "$funding_rounds"},
+  {$project : {_id : 0, name : 1, founded_year : 1,
+                //"funding_rounds.raised_amount" : 1
+                amount : "$funding_rounds.raised_amount"
+  }},
+])

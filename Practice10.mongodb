@@ -1,0 +1,97 @@
+use("sample_analytics")
+db.customers.aggregate(
+  {
+    $lookup: {
+      from: "transactions",
+      localField: "accounts",
+      foreignField: "account_id",
+      as: "trans"
+    }
+  },
+  {
+    $unwind: "$trans"
+  },
+  {
+    $match: {
+      name: "John Parks"
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      name: 1,
+      account_id: "$trans.account_id",
+      code: "$trans.transactions.transaction_code",
+      symbol: "$trans.transactions.symbol",
+      price: "$trans.transactions.price"
+    }
+  },
+  {
+    $unwind: {
+      path: "$code", includeArrayIndex: "index1"
+    }
+  },
+  {
+    $unwind: {
+      path: "$symbol", includeArrayIndex: "index2"
+    }
+  },
+  {
+    $unwind: {
+      path: "$price", includeArrayIndex: "index3"
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      name: 1,
+      account_id: 1,
+      price: 1,
+      symbol: 1,
+      //valid1: {
+        //$eq: ["$index1", "$index2"]
+      //},
+     // valid2: {
+       // $eq: ["$index2", "$index3"]
+      //}
+      valid1 : {$cmp : ["$index1", "$index2"]},
+      valid2 : {$cmp : ["$index2", "$index3"]}
+    }
+  },
+    //$match: {
+      //valid1: true,
+     // valid2: true
+    //}
+    {$match : {valid1 : 0, valid2 : 0}},
+
+  {
+    $project: {
+      _id: 0,
+      name: 1,
+      account_id: 1,
+      code: 1,
+      symbol: 1,
+      price: 1
+    }
+  }
+)
+
+db.customers.aggregate(
+  {
+    $lookup : {
+      from : "transactions",
+      let : {local_id1 : {$arrayElemAt : ["$accounts", 0]},
+            local_id2 : {$arrayElemAt : ["$accounts", -1]}
+      },
+      pipeline : [
+        {$match : {$expr : {$or: [
+          {$eq : ["$$local_id1","$account_id"]},
+          {$eq : ["$$local_id2","$account_id"]}
+      ]}}}
+      ],
+      as : "trans"
+    }
+  },
+  {$match : {name : "Elizabeth Ray"}},
+  {$project : {_id : 0, name : 1, account_id : "$trans.account_id"}}
+)

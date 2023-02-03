@@ -1,0 +1,74 @@
+/*use("Books")
+
+db.data.find(
+  {pageCount : {$gt : 1000}}
+)
+
+db.data.find(
+  {$where : "this.pageCount > 1000"}
+)
+
+db.data.find(
+  {$and : [{$where : "this.authors.length > 3"},
+  {title : {$regex : "Action"}}
+  ]}
+  
+)
+
+//db.data.find(
+  //{$where : "this.categories.length > 3"}
+//)
+
+db.data.find({title : "Unlocking Android"})
+
+db.data.find(
+  {title: "Unlocking Android"},
+  {authors : {$slice : -1}}
+)
+
+db.data.find(
+  {title : "Unlocking Android"},
+  {authors : {$slice : [1, 2]}}
+) */
+
+
+use("test")
+
+db.dropDatabase()
+use("test")
+
+db.people.insertMany([
+  {name : {first : "joe", last : "smith"}, age : 33,
+    courses : [
+      {course_id : "CS3500", grade : "C"},
+      {course_id : "CS3500", grade : "B"},
+    ]
+  },
+  {name : {first : "mary", last : "kate"}, age : 29,
+    courses : [
+      {course_id : "CS5200", grade : "B"},
+    
+    ]
+  },
+  {name : {first : "sarah", last : "johnson"}, age : 33,
+    courses : [
+      {course_id : "CS5200", grade : "A"},
+      {course_id : "CS5220", grade : "B"},
+    ]
+  },
+  //{name : {first : "bob", last : "dole"}, age : 62},
+  //{name : {first : "joe", last : "bush"}, age : 24},
+])
+
+db.people.find(
+  {name : {first : "joe", last : "smith"}}
+)
+
+db.people.find(
+  {"name.first" : "joe", "name.last" : "smith"}
+)
+
+db.people.find().sort({age : 1, "name.last" : 1})
+
+db.people.find({$and:[{"courses.course_id":"CS5200"},
+{"courses.grade":"A"}]},{"name":1,"_id":0})

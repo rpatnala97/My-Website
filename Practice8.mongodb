@@ -1,0 +1,54 @@
+use("Company")
+
+//$bucket
+//groupBy - grouping attribute
+//boundaries - bins
+//output - bin output
+
+db.companies.aggregate(
+  {$match : {number_of_employees : {$ne : null}}},
+  {$bucket :{
+      groupBy : "$number_of_employees",
+      boundaries : [0, 20, 50, 100, 500, 1000, Infinity],
+      output : {
+       count : {$sum : 1},
+       average_num_employees : {$avg : "$number_of_employees"},
+       categories : {$addToSet : "$category_code"}
+      }
+  }}
+)
+
+//$bucketAuto
+//groupBy - grouping attribute
+//bucket - no of geroups
+//output - bin output
+
+db.companies.aggregate(
+  {$match : {number_of_employees : {$ne : null}}},
+  {$bucketAuto :{
+      groupBy : "$number_of_employees",
+      buckets : 6,
+      output : {
+       count : {$sum : 1},
+       average_num_employees : {$avg : "$number_of_employees"},
+       //categories : {$addToSet : "$category_code"}
+      }
+  }}
+)
+
+db.companies.aggregate(
+  {$match : {number_of_employees : {$ne : null}}},
+  {$project : {_id : 0, name : 1, number_of_employees : 1,
+        total_raised_amount : {$sum : "$funding_rounds.raised_amount"}
+  }},
+  {$match : {total_raised_amount : {$ne : 0}}},
+  //{$sort : {total_raised_amount : -1}},
+  {$facet : {
+    employees : [{$sort : {number_of_employees : -1}}, {$limit : 10}],
+    raised_amount : [{$sort : {total_raised_amount : -1}}, {$limit : 10}],
+  }},
+  {$project : {data :
+
+      {$setIntersection : ["$employees", "$raised_amount"]}
+  }}
+)

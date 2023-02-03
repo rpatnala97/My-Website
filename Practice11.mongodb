@@ -1,0 +1,23 @@
+use("Company")
+
+db.companies.aggregate(
+  {$match : {founded_year : 2004}},
+  {$project : {_id : 0, name : 1,
+        company_type : {$cond : {if : {$ne : ["$ipo", null]},
+                                 then : "public company",
+                                 else : "private company"
+        }}
+  }}
+)
+
+db.companies.aggregate(
+  {$match : {founded_year : 2004}},
+  {$project : {_id : 0, name : 1,
+    company_type : {$switch : {branches : [
+      {case : {$ne : ["$ipo", null]},then : "public company"},
+      {case : {$eq : ["$ipo", null]}, then : "private company"}
+    ],
+    default : "Unknown"
+    }}
+  }}
+)

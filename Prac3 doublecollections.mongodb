@@ -1,0 +1,52 @@
+/*
+use('Text')
+
+db.dropDatabase()
+use('Text')
+
+db.users.insertMany([
+  {_id : 12345, name : "John"},
+  {_id : 123456789, name : "Kate"},
+  {_id : 778899, name : "Mary"},
+])
+
+db.users.find()
+
+db.posts.insertMany([
+  {content : "John's post", owner_id : 12345},
+  {content : "Kate's post", owner_id : 123456789}
+])
+
+var myCursor = db.users.find({name : "Kate"} )
+var user = myCursor.hasNext() ? myCursor.next() : null
+
+//print the name and content from two different collections
+db.posts.find({owner_id : user._id},
+              {name : user.name,content : 1, _id : 0}
+)
+*/
+
+use("sample_analytics")
+
+db.customers.find().limit(2)
+db.accounts.find().limit(2)
+db.transactions.find().limit(2)
+
+var myCursor = db.customers.find({name : "John Parks"})
+var user = myCursor.hasNext() ? myCursor.next() : null
+
+db.results.drop()
+
+for (var i=0; i<user.accounts.length; i++){
+    result = db.accounts.findOne(
+        {account_id : user.accounts[i]},
+        {_id : 0, products : 1, account_id : 1}
+    ),
+    db.results.insertOne(result)
+}
+
+db.results.find(
+    {},
+    {_id : 0}
+)
+

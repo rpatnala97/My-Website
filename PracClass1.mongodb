@@ -1,0 +1,106 @@
+
+use("Books")
+
+db.data.count();
+
+db.data.find().limit(1);
+
+db.data.distinct("categories").length
+
+db.data.distinct("authors").length
+
+use("Video");
+db.dropDatabase()
+
+use("Video")
+/*
+movie={title:"Star War: Episode IV - A New Hope",director: "George Lucas",year: 1977}
+db.movies.insertOne(movie);
+
+db.movies.updateOne(
+    {title:"Star War: Episode IV - A New Hope"},
+    {$set : {reviewers: ["Dr.Lui","whoever"]}}
+)
+
+db.movies.find()
+person={name:"John Doe",
+        address:{street: "123 Park Street", city:"Kansas City",state:"KS"}
+}
+db.customers.insertOne(person);
+person={name:"Mary Kate",
+        address:{street: "10 Downing Street", city:"Kansas City",state:"MO"}
+}
+db.customers.insertOne(person);
+//db.customers.drop()
+
+db.customers.find({name:"John Doe"})
+
+*/
+db.movies.insertMany([
+  {"_id":0, title:"Top Gun",year:1986},
+  {"_id":1, title:"Back to the Future",year:1985},
+  {"_id":2, title:"E.T.",year:1982},
+  {"_id":3, title:"Ghostbusters",year:1984},
+  {"_id":4, title:"Aliens",year:1986},
+])
+
+//db.movies.deleteOne({"_id":2})
+//db.movies.deleteOne({"title":"Top Gun"})
+
+//db.movies.deleteMany({"year":1986})
+/*
+db.movies.replaceOne(
+    {"title": "Back to the Future"},
+    {"title": "Back to the Future II","year":1989}
+    )
+
+
+db.movies.updateOne(
+    {title:"Ghostbusters"},
+    {$set:{"title":"The Karate Kid"}})
+
+
+db.movies.updateOne(
+    {title:"Ghostbusters"},
+    {$inc:{quantity:10}}
+)
+
+db.movies.updateOne(
+    {title:"Ghostbusters"},
+    {$inc:{quantity:10}}
+)
+
+db.movies.updateOne(
+    {title:"Ghostbusters"},
+    {$inc:{quantity:-5}}
+)
+*/
+
+db.movies.updateMany(
+    {year:1986},
+    {$set:{category:"recommended"}}
+)
+/*
+db.movies.updateOne(
+    {title : "E.T."},
+    {$push : {reviews : {name : "joe", comments : "A nice movie"}}}
+)
+
+db.movies.updateOne(
+    {title : "E.T."},
+    {$push : {reviews : {name : "bob", comments : "A sad movie"}}}
+)
+*/
+
+db.movies.updateOne(
+    {title : "E.T."},
+    {$push : {reviews : {each : [
+        {name : "joe", comments : "A nice movie", rating : 4.3},
+        {name : "bob", comments : "A sad movie", rating : 4.5},
+        {name : "sarah", comments : "Not kid friendly", rating : 3.8}
+    ],
+    $sort : {rating : 1}
+    }}}
+)
+
+db.movies.find();

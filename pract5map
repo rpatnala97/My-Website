@@ -1,0 +1,69 @@
+use("Test3")
+
+db.dropDatabase()
+use("Test3")
+
+// db.students.insertMany([
+//   {name:"John",course:"CS5200",score:86},
+//   {name:"John",course:"CS5500",score:82},
+//   {name:"Kate",course:"CS5300",score:88},
+//   {name:"Kate",course:"CS5710",score:93},
+//   {name:"Kate",course:"CS5900",score:90},
+//   {name:"Sarah",course:"CS5200",score:84},
+//   {name:"Sarah",course:"CS5600",score:94},
+//   {name:"Peter",course:"CS5710",score:90},
+//   {name:"Peter",course:"CS5600",score:90}
+// ])
+
+// db.students.find()
+
+// var map = function() {emit(this.name,this.score);}
+
+// var reduce = function(name,score) {
+//     student_score = {total:0,avg:0}
+//     student_score.total = Array.sum(score);
+//     student_score.avg = student_score.total/score.length;
+//     return student_score;
+// }
+
+
+
+
+// db.students.mapReduce(map,reduce,"output");
+
+// db.output.updateMany({},{$rename:{"value":"score"}})
+// db.output.find().sort({"score.avg":-1})
+
+
+db.blogs.insertMany([
+    {title:"Database",published:"2017-03-27",
+    authors:[{firstname:"Chris",lastname:"Johnson"},
+    {firstname:"Kate",lastname:"Peterson"}]},
+        {title:"MobileApp",published:"2016-03-27",
+    authors:[{firstname:"Chris",lastname:"Johnson"}]},
+        {title:"MobileApp",published:"2011-03-27",
+    authors:[{firstname:"Chris",lastname:"Peterson"}]},
+
+        {title:"Java in Action",published:"2011-03-27",
+    authors:[{firstname:"Kate",lastname:"Peterson"}]},
+]);
+
+db.blogs.find();
+
+var map = function() {
+
+for(i=0;i<this.authors.length;i++){
+    author = this.authors[i];
+    emit(author.firstname +" "+author.lastname,1)
+}
+}
+
+var reduce = function(author,counters) {
+    count = Array.sum(counters);
+    return count;
+}
+
+
+db.blogs.mapReduce(map,reduce,"output")
+
+db.output.find()

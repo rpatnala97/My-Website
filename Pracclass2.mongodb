@@ -1,0 +1,71 @@
+use ("Books")
+
+db.data.find({categories : "Java"}).limit(2)
+
+db.data.find(
+  {pageCount : {$gt : 1000}}
+)
+
+var date = new Date("01/01/2013")
+db.dat.find(
+  {publishedDate : {$gt : date}}
+)
+
+db.data.find(
+  {publishedDate : null}
+).count()
+
+db.data.find({title : "Unlocking Android"})
+
+db.data.find(
+  {title : {regex : "Android"}}
+)
+
+db.data.find(
+  {title : {$regex : /.*Android.*/}}
+)
+
+db.data.find(
+  {title : {regex : "android", $options : "i"}}
+)
+
+db.data.find(
+  {title : {$regex : "^Java"}}
+)
+
+db.data.find(
+  {title : {$regex : "Java$"}}
+)
+
+db.data.find(
+  {title : {$regex : "^((?!Java).)*$"}}
+)
+
+//and condition
+db.data.find(
+  {$and : [
+    {categories : "Java"},
+    {pageCount : {$gt : 1000}}
+  ]}
+)
+
+//and condition
+db.data.find(
+  {categories : "Java", pageCount : {$gt : 1000}}
+)
+
+//or condition
+db.datta.find(
+  {$or : [
+    {categories : "Java"},
+    {categories : "Internet"}
+  ]}
+)
+
+db.data.find(
+  {categories : {$all : ["Java", "Internet"]}}
+)
+
+db.data.find(
+  {authors : {$size : 3}}
+).count()

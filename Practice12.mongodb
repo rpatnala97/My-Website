@@ -1,0 +1,28 @@
+use("Test2")
+
+db.dropDatabase()
+use("Test2")
+
+db.employees.insertMany([
+  {_id : 1, name : "Dev"},
+  {_id : 2, name : "Eliot", reportTo : "Dev"},
+  {_id : 3, name : "Ron", reportTo : "Eliot"},
+  {_id : 4, name : "Andrew", reportTo : "Eliot"},
+  {_id : 5, name : "Asya", reportTo : "Ron"},
+  {_id : 6, name : "Dan", reportTo : "Andrew"},
+  
+])
+
+db.employees.find()
+
+db.employees.aggregate(
+  {
+    $graphLookup : {
+      from : "employees",
+      startWith : "$reportTo",
+      connectFromField : "reportTo",
+      connectToField : "name",
+      as : "reporting"
+    }
+  }
+)
